@@ -1,5 +1,6 @@
 /// <reference path="./jsx.d.ts" />
 
+export * from "./error-boundary";
 export * from "./finish-context";
 export * from "./link-preview-context";
 export * from "./message";

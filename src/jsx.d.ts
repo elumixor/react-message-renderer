@@ -4,7 +4,12 @@ import type { LinkPreviewOptions } from "./link-preview-context";
 declare module "react" {
   namespace JSX {
     interface IntrinsicElements {
-      "io-message": { children?: ReactNode; repliesTo?: number; linkPreview?: LinkPreviewOptions };
+      "io-message": {
+        children?: ReactNode;
+        repliesTo?: number;
+        threadId?: number;
+        linkPreview?: LinkPreviewOptions;
+      };
       "io-text": { children?: ReactNode };
       b: { children?: ReactNode };
       i: { children?: ReactNode };

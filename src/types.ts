@@ -1,3 +1,8 @@
+/**
+ * Well-known element type names. Target packages can introduce additional
+ * types at the JSX layer; the reconciler accepts any string and stores it
+ * verbatim on the resulting ElementNode.
+ */
 export type ElementType =
   | "io-root"
   | "io-message"

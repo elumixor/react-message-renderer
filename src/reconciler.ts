@@ -43,8 +43,8 @@ export const reconciler = Reconciler({
   supportsHydration: false,
   isPrimaryRenderer: true,
 
-  createInstance(type: ElementType, props: Props): ElementNode {
-    return { type, props, children: [] };
+  createInstance(type: string, props: Props): ElementNode {
+    return { type: type as ElementType, props, children: [] };
   },
 
   createTextInstance(text: string): TextNode {
@@ -95,7 +95,7 @@ export const reconciler = Reconciler({
     return {};
   },
 
-  getChildHostContext(_parentContext: unknown, _type: ElementType) {
+  getChildHostContext(_parentContext: unknown, _type: string) {
     return {};
   },
 
