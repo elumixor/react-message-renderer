@@ -1,0 +1,51 @@
+{
+  "name": "@elumixor/react-message-renderer",
+  "version": "0.1.0",
+  "description": "Custom React reconciler that turns JSX (with hooks, state, effects) into a streaming, diff-aware tree of messages. Bring-your-own target.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elumixor/react-message-renderer.git"
+  },
+  "files": [
+    "./dist"
+  ],
+  "scripts": {
+    "build": "bun run build:clean && bun run build:bundle && bun run build:declaration",
+    "build:clean": "rm -rf ./dist",
+    "build:bundle": "bun build ./src/index.ts --outdir ./dist --target=node --external react --external react-reconciler",
+    "build:declaration": "tsc --project tsconfig.build.json",
+    "test": "bun test",
+    "check": "tsc --noEmit && bun run lint && biome format .",
+    "lint": "biome check . --fix",
+    "format": "biome format . --write",
+    "release:patch": "npm version patch -m \"Release v%s\" && git push --tags",
+    "release:minor": "npm version minor -m \"Release v%s\" && git push --tags",
+    "release:major": "npm version major -m \"Release v%s\" && git push --tags"
+  },
+  "keywords": [
+    "react",
+    "reconciler",
+    "renderer",
+    "streaming",
+    "jsx"
+  ],
+  "author": "elumixor",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": ">=19"
+  },
+  "dependencies": {
+    "react-reconciler": "^0.32.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.6",
+    "@types/bun": "^1.2.21",
+    "@types/react": "^19.0.0",
+    "@types/react-reconciler": "^0.32.0",
+    "react": "^19.0.0",
+    "typescript": "^5"
+  }
+}
