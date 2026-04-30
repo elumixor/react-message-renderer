@@ -2,18 +2,12 @@ import { describe, expect, mock, test } from "bun:test";
 import { useEffect, useState } from "react";
 import { useFinishRender } from "./finish-context";
 import { Message } from "./message";
-import { Renderer, type RendererLogger } from "./Renderer";
+import { Renderer } from "./Renderer";
 import { serialize } from "./serializer";
 import type { ElementNode } from "./types";
 
 class CapturingRenderer extends Renderer {
   readonly commits: string[][] = [];
-  readonly logger: RendererLogger;
-
-  constructor(opts: { throttleMs?: number; logger?: RendererLogger } = {}) {
-    super(opts);
-    this.logger = opts.logger ?? { warn: () => {}, error: () => {} };
-  }
 
   protected override renderMessages(messageNodes: ElementNode[]): Promise<void> {
     this.commits.push(messageNodes.map(serialize));

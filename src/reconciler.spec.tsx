@@ -4,6 +4,7 @@ import { useFinishRender } from "./finish-context";
 import { Message } from "./message";
 import { Renderer } from "./Renderer";
 import { serialize } from "./serializer";
+import { nonNull } from "./test-helpers";
 import type { ElementNode } from "./types";
 
 class StateCapturingRenderer extends Renderer {
@@ -50,9 +51,9 @@ describe("reconciler", () => {
         <Done />
       </>,
     );
-    const last = r.trees[r.trees.length - 1];
+    const last = nonNull(r.trees[r.trees.length - 1]);
     expect(last.length).toBe(1);
-    const msg = last[0];
+    const msg = nonNull(last[0]);
     expect(msg.type).toBe("io-message");
     const b = msg.children[0] as ElementNode;
     expect(b.type).toBe("b");
@@ -74,8 +75,8 @@ describe("reconciler", () => {
       return <Message>v={n}</Message>;
     }
     await r.render(<Counter />);
-    const final = r.trees[r.trees.length - 1];
-    expect(serialize(final[0])).toBe("v=2");
+    const final = nonNull(r.trees[r.trees.length - 1]);
+    expect(serialize(nonNull(final[0]))).toBe("v=2");
   });
 
   test("removing children leaves no orphans in parent.children", async () => {
@@ -95,8 +96,8 @@ describe("reconciler", () => {
       );
     }
     await r.render(<Toggle />);
-    const last = r.trees[r.trees.length - 1];
-    const msg = last[0];
+    const last = nonNull(r.trees[r.trees.length - 1]);
+    const msg = nonNull(last[0]);
     expect(msg.children.length).toBe(1);
     expect((msg.children[0] as ElementNode).type).toBe("i");
   });
@@ -119,10 +120,9 @@ describe("reconciler", () => {
       );
     }
     await r.render(<Reorder />);
-    const last = r.trees[r.trees.length - 1];
-    const texts = (last[0].children as ElementNode[]).map(
-      (c) => (c.children[0] as { type: "TEXT"; text: string }).text,
-    );
+    const last = nonNull(r.trees[r.trees.length - 1]);
+    const root = nonNull(last[0]);
+    const texts = (root.children as ElementNode[]).map((c) => (c.children[0] as { type: "TEXT"; text: string }).text);
     expect(texts).toEqual(["c", "a", "b"]);
   });
 });

@@ -82,7 +82,6 @@ export abstract class Renderer implements IRenderer {
         this.logger.warn("React recoverable error", error);
       },
       () => this.logger.error("React scheduler error"),
-      null,
     );
 
     const unmount = () => reconciler.updateContainer(null, fiberRoot, null, null);

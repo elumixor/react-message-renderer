@@ -4,6 +4,7 @@ import { useFinishRender } from "./finish-context";
 import { LinkPreviewProvider } from "./link-preview-context";
 import { Message } from "./message";
 import { Renderer } from "./Renderer";
+import { nonNull } from "./test-helpers";
 import type { ElementNode } from "./types";
 
 class CaptureTreeRenderer extends Renderer {
@@ -37,8 +38,9 @@ describe("Message", () => {
         <Done />
       </>,
     );
-    expect(r.last?.[0].props.repliesTo).toBe(42);
-    expect(r.last?.[0].props.linkPreview).toBe(lp);
+    const node = nonNull(r.last?.[0]);
+    expect(node.props.repliesTo).toBe(42);
+    expect(node.props.linkPreview).toBe(lp);
   });
 
   test("falls back to LinkPreviewProvider context", async () => {
@@ -49,7 +51,8 @@ describe("Message", () => {
         <Done />
       </LinkPreviewProvider>,
     );
-    const lp = r.last?.[0].props.linkPreview as { ignored: Set<string>; previewUrl?: string } | undefined;
+    const node = nonNull(r.last?.[0]);
+    const lp = node.props.linkPreview as { ignored: Set<string>; previewUrl?: string } | undefined;
     expect(lp?.previewUrl).toBe("https://ctx.test");
     expect(lp?.ignored.has("https://skip.test")).toBe(true);
   });
@@ -63,7 +66,8 @@ describe("Message", () => {
         <Done />
       </LinkPreviewProvider>,
     );
-    const lp = r.last?.[0].props.linkPreview as { previewUrl?: string };
+    const node = nonNull(r.last?.[0]);
+    const lp = node.props.linkPreview as { previewUrl?: string };
     expect(lp.previewUrl).toBe("https://explicit.test");
   });
 });
