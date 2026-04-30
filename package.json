@@ -1,6 +1,6 @@
 {
   "name": "@elumixor/react-message-renderer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Custom React reconciler that turns JSX (with hooks, state, effects) into a streaming, diff-aware tree of messages. Bring-your-own target.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
