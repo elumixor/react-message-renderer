@@ -93,7 +93,7 @@ export abstract class Renderer implements IRenderer {
             // Synchronously flush any pending setStates (e.g. one set right before
             // finish()) into currentRoot before we ship the final commit. Without
             // this, a setX(...); void finish() pair would race React's scheduler.
-            reconciler.flushSyncFromReconciler(() => {});
+            reconciler.flushSyncFromReconciler();
             await this.flushCommit();
             this.currentRoot = undefined;
             unmount();
