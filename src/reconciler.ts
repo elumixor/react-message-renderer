@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import Reconciler, { type ReactContext } from "react-reconciler";
-import { DefaultEventPriority } from "react-reconciler/constants";
+import { DiscreteEventPriority } from "react-reconciler/constants";
 import type { Container, ElementNode, ElementType, OutputNode, TextNode } from "./types";
 
 type Props = Record<string, unknown>;
@@ -35,7 +35,10 @@ function insertBefore(parent: ElementNode, child: OutputNode, before: OutputNode
   else parent.children.push(child);
 }
 
-let currentUpdatePriority: Reconciler.EventPriority = DefaultEventPriority;
+// Discrete (sync) priority for all updates: this is a server-side renderer,
+// there's no benefit to concurrent rendering, and sync priority lets
+// flushSyncFromReconciler() actually flush pending setStates before commit.
+let currentUpdatePriority: Reconciler.EventPriority = DiscreteEventPriority;
 
 export const reconciler = Reconciler({
   supportsMutation: true,
@@ -161,7 +164,9 @@ export const reconciler = Reconciler({
     return currentUpdatePriority;
   },
   resolveUpdatePriority(): Reconciler.EventPriority {
-    return currentUpdatePriority;
+    // Setting all updates to sync priority means flushSyncFromReconciler() can
+    // actually drain pending work before we ship the final commit on finish().
+    return DiscreteEventPriority;
   },
 
   resetFormInstance(): void {

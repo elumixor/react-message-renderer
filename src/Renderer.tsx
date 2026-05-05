@@ -48,8 +48,7 @@ export abstract class Renderer implements IRenderer {
   protected readonly logger: RendererLogger;
   private throttleTimer?: ReturnType<typeof setTimeout>;
   private currentRoot?: ElementNode;
-  private isCommitting = false;
-  private needsCommit = false;
+  private commitChain: Promise<void> = Promise.resolve();
 
   constructor({ throttleMs = 800, logger = defaultLogger }: RendererOptions = {}) {
     this.throttleMs = throttleMs;
@@ -90,9 +89,12 @@ export abstract class Renderer implements IRenderer {
       const wrappedElement = (
         <FinishRenderProvider
           onFinish={async () => {
-            // Synchronously flush any pending setStates (e.g. one set right before
-            // finish()) into currentRoot before we ship the final commit. Without
-            // this, a setX(...); void finish() pair would race React's scheduler.
+            // Drain pending setStates into currentRoot before reading it for the
+            // final commit. flushSyncFromReconciler handles sync-priority work;
+            // the macrotask yield covers any work the Scheduler still has queued
+            // (e.g. effects that fire post-commit and dispatch their own state).
+            reconciler.flushSyncFromReconciler();
+            await new Promise<void>((r) => setTimeout(r, 0));
             reconciler.flushSyncFromReconciler();
             await this.flushCommit();
             this.currentRoot = undefined;
@@ -114,31 +116,23 @@ export abstract class Renderer implements IRenderer {
     if (this.throttleTimer) return;
     this.throttleTimer = setTimeout(() => {
       this.throttleTimer = undefined;
-      void this.doCommit({ flush: false });
+      this.commitChain = this.commitChain.then(() => this.doCommit());
     }, this.throttleMs);
   }
 
-  /** Flush any pending commit immediately. */
+  /** Flush any pending commit immediately, waiting for any in-flight commit to drain first. */
   private async flushCommit(): Promise<void> {
     if (this.throttleTimer) {
       clearTimeout(this.throttleTimer);
       this.throttleTimer = undefined;
     }
-    await this.doCommit({ flush: true });
+    this.commitChain = this.commitChain.then(() => this.doCommit());
+    await this.commitChain;
   }
 
-  /** Execute the actual commit. Serializes concurrent calls. */
-  private async doCommit({ flush }: { flush: boolean }): Promise<void> {
+  /** One commit pass. Errors are logged so the serialized chain never breaks. */
+  private async doCommit(): Promise<void> {
     if (!this.currentRoot) return;
-
-    if (this.isCommitting) {
-      this.needsCommit = true;
-      return;
-    }
-
-    this.isCommitting = true;
-    this.needsCommit = false;
-
     try {
       const messageNodes = findMessageNodes(this.currentRoot);
 
@@ -151,17 +145,6 @@ export abstract class Renderer implements IRenderer {
       await this.renderMessages(messageNodes);
     } catch (error) {
       this.logger.error("Failed to commit messages", error);
-    } finally {
-      this.isCommitting = false;
-
-      if (this.needsCommit) {
-        this.needsCommit = false;
-        if (flush) {
-          await this.doCommit({ flush: true });
-        } else {
-          this.scheduleCommit();
-        }
-      }
     }
   }
 
