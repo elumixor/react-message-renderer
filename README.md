@@ -1,8 +1,12 @@
 # @elumixor/react-message-renderer
 
+[![npm version](https://img.shields.io/npm/v/@elumixor/react-message-renderer.svg)](https://www.npmjs.com/package/@elumixor/react-message-renderer)
+[![CI](https://github.com/elumixor/react-message-renderer/actions/workflows/build.yml/badge.svg)](https://github.com/elumixor/react-message-renderer/actions/workflows/build.yml)
+[![License: ISC](https://img.shields.io/badge/license-ISC-blue.svg)](./LICENSE)
+
 A custom React reconciler that turns JSX (with hooks, state, effects, context) into a tree of messages — and lets you stream those messages into any **mutable** target.
 
-The reconciler is target-agnostic. To do something useful, pair it with a target package such as [`@elumixor/react-telegram`](../react-telegram), or implement your own (Discord, Slack, console, log file, anything where messages can be edited in place).
+The reconciler is target-agnostic. To do something useful, pair it with a target package such as [`@elumixor/react-telegram`](https://github.com/elumixor/react-telegram), or implement your own (Discord, Slack, console, log file, anything where messages can be edited in place).
 
 ## Why
 
@@ -69,7 +73,7 @@ The `Renderer` base class:
 
 ## Target packages
 
-- [`@elumixor/react-telegram`](../react-telegram) — grammy-backed renderer that diffs into editable Telegram messages.
+- [`@elumixor/react-telegram`](https://github.com/elumixor/react-telegram) — grammy-backed renderer that diffs into editable Telegram messages.
 
 ## Status
 
