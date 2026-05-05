@@ -90,9 +90,10 @@ export abstract class Renderer implements IRenderer {
       const wrappedElement = (
         <FinishRenderProvider
           onFinish={async () => {
-            // Yield a macrotask so any setState that landed just before finish()
-            // gets a chance to commit into currentRoot before we flush.
-            await new Promise<void>((r) => setTimeout(r, 0));
+            // Synchronously flush any pending setStates (e.g. one set right before
+            // finish()) into currentRoot before we ship the final commit. Without
+            // this, a setX(...); void finish() pair would race React's scheduler.
+            reconciler.flushSyncFromReconciler(() => {});
             await this.flushCommit();
             this.currentRoot = undefined;
             unmount();
