@@ -2,9 +2,15 @@
   "name": "@elumixor/react-message-renderer",
   "version": "0.2.4",
   "description": "Custom React reconciler that turns JSX (with hooks, state, effects) into a streaming, diff-aware tree of messages. Bring-your-own target.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/elumixor/react-message-renderer.git"
@@ -13,10 +19,7 @@
     "./dist"
   ],
   "scripts": {
-    "build": "bun run build:clean && bun run build:bundle && bun run build:declaration",
-    "build:clean": "rm -rf ./dist",
-    "build:bundle": "bun build ./src/index.ts --outdir ./dist --target=node --external react --external react-reconciler",
-    "build:declaration": "tsc --project tsconfig.build.json",
+    "build": "unbuild",
     "test": "bun test",
     "check": "tsc --noEmit && bun run lint && biome format .",
     "lint": "biome check . --fix",
@@ -46,6 +49,7 @@
     "@types/react": "^19.2.14",
     "@types/react-reconciler": "^0.33.0",
     "react": "^19.2.5",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "unbuild": "^3.6.1"
   }
 }
