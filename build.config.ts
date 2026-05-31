@@ -15,10 +15,7 @@ export default defineBuildConfig({
       plugins.push({
         name: "fix-bare-cjs-subpaths",
         renderChunk(code) {
-          return code.replace(
-            /from\s+(['"])react-reconciler\/constants\1/g,
-            "from $1react-reconciler/constants.js$1",
-          );
+          return code.replace(/from\s+(['"])react-reconciler\/constants\1/g, "from $1react-reconciler/constants.js$1");
         },
       });
       options.plugins = plugins;

@@ -1,4 +1,4 @@
-import { Renderer, type RendererOptions } from "../Renderer";
+import { Renderer, type RendererOptions, type RenderPassOptions } from "../Renderer";
 import { serialize } from "../serializer";
 import type { ElementNode } from "../types";
 
@@ -15,7 +15,7 @@ export class ConsoleRenderer extends Renderer {
     this.clear = options.clear ?? true;
   }
 
-  protected override renderMessages(messageNodes: ElementNode[]): Promise<void> {
+  protected override renderMessages(messageNodes: ElementNode[], _options: RenderPassOptions): Promise<void> {
     if (this.clear) console.clear();
 
     for (const node of messageNodes) {

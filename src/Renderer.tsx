@@ -43,6 +43,14 @@ export interface IRenderer {
   render(element: ReactNode): Promise<void>;
 }
 
+export interface RenderPassOptions {
+  /**
+   * True when this is the final commit, triggered by `useFinishRender()`. Targets can use this
+   * to switch from an ephemeral streaming representation to a persisted one (e.g. Telegram drafts).
+   */
+  final: boolean;
+}
+
 export abstract class Renderer implements IRenderer {
   private readonly throttleMs: number;
   protected readonly logger: RendererLogger;
@@ -116,7 +124,7 @@ export abstract class Renderer implements IRenderer {
     if (this.throttleTimer) return;
     this.throttleTimer = setTimeout(() => {
       this.throttleTimer = undefined;
-      this.commitChain = this.commitChain.then(() => this.doCommit());
+      this.commitChain = this.commitChain.then(() => this.doCommit(false));
     }, this.throttleMs);
   }
 
@@ -126,12 +134,12 @@ export abstract class Renderer implements IRenderer {
       clearTimeout(this.throttleTimer);
       this.throttleTimer = undefined;
     }
-    this.commitChain = this.commitChain.then(() => this.doCommit());
+    this.commitChain = this.commitChain.then(() => this.doCommit(true));
     await this.commitChain;
   }
 
   /** One commit pass. Errors are logged so the serialized chain never breaks. */
-  private async doCommit(): Promise<void> {
+  private async doCommit(final: boolean): Promise<void> {
     if (!this.currentRoot) return;
     try {
       const messageNodes = findMessageNodes(this.currentRoot);
@@ -142,11 +150,11 @@ export abstract class Renderer implements IRenderer {
         );
       }
 
-      await this.renderMessages(messageNodes);
+      await this.renderMessages(messageNodes, { final });
     } catch (error) {
       this.logger.error("Failed to commit messages", error);
     }
   }
 
-  protected abstract renderMessages(messageNodes: ElementNode[]): Promise<void>;
+  protected abstract renderMessages(messageNodes: ElementNode[], options: RenderPassOptions): Promise<void>;
 }
